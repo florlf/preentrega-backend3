@@ -57,13 +57,13 @@ El servidor proporciona dos grupos de rutas:
 
 4. **PUT /api/products/:pid**
 
-    Actualiza un producto existente con los datos proporcionados. El ID del producto no debe cambiar. Los campos que se pueden actualizar son:
+   Actualiza un producto existente con los datos proporcionados. El ID del producto no debe cambiar. Los campos que se pueden actualizar son:
 
-    `title`, `description`, `code`, `price`, `status`, `stock`, `category` y `thumbnails`.
+   `title`, `description`, `code`, `price`, `status`, `stock`, `category` y `thumbnails`.
 
 5. **DELETE /api/products/:pid**
 
-    Elimina un producto con el ID proporcionado. Si no se encuentra el producto, se responde con un error 404.
+   Elimina un producto con el ID proporcionado. Si no se encuentra el producto, se responde con un error 404.
 
 
 ### /api/carts
@@ -89,15 +89,15 @@ El servidor proporciona dos grupos de rutas:
    *Ejemplo en Postman: GET http://localhost:8080/api/carts/1*
 
 3. **POST /api/carts/:cid/product/:pid**
-    Agrega un producto al carrito. Si el producto ya está presente en el carrito, incrementa su cantidad en 1. Si no, agrega el producto con una cantidad de 1.
+   Agrega un producto al carrito. Si el producto ya está presente en el carrito, incrementa su cantidad en 1. Si no, agrega el producto con una cantidad de 1.
 
-    Ejemplo de cuerpo de solicitud:
-    ```json
-    {
-        "quantity": 1
-    }
+   Ejemplo de cuerpo de solicitud:
+   ```json
+   {
+      "quantity": 1
+   }
 
 *Ejemplo en Postman: POST http://localhost:8080/api/carts/1/product/1*
 
 4. **DELETE /api/carts/:cid**
-    Elimina un carrito con el ID proporcionado. Si no se encuentra el carrito, responde con un error 404.
+   Elimina un carrito con el ID proporcionado. Si no se encuentra el carrito, responde con un error 404.
