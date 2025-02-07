@@ -36,7 +36,7 @@ Este proyecto simula un sistema de manejo de productos y carritos de compras uti
 
 ### Endpoints de la API (HTTP)
 
-## Postman Collections
+#### Postman Collections
 
 Se puede encontra la colección de Postman para probar los endpoints de la API en la carpeta `postman/collections`.
 
