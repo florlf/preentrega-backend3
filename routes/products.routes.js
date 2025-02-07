@@ -4,7 +4,6 @@ const ProductManager = require("../managers/ProductManager");
 const router = Router();
 const productManager = new ProductManager("./data/productos.json");
 
-
 router.get("/", async (req, res) => {
   const limit = req.query.limit;
   const products = await productManager.getProducts(limit);

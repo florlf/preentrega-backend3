@@ -5,7 +5,6 @@ class CartManager {
     this.path = path;
   }
 
-
   async createCart() {
     const data = await this._readFile();
     const newCart = { 
@@ -17,13 +16,11 @@ class CartManager {
     return newCart;
   }
 
-
   async getCartById(id) {
     const data = await this._readFile();
     const idNumber = Number(id);
     return data.find((cart) => cart.id === idNumber);
   }
-
 
   async addProductToCart(cartId, productId) {
     const data = await this._readFile();
@@ -62,7 +59,6 @@ class CartManager {
     return true;
   }
   
-
   async _readFile() {
     try {
       const data = await fs.readFile(this.path, "utf-8");
@@ -72,11 +68,9 @@ class CartManager {
     }
   }
 
-
   async _writeFile(data) {
     await fs.writeFile(this.path, JSON.stringify(data, null, 2));
   }
-
 
   _generateId(data) {
     return data.length ? Math.max(...data.map((cart) => cart.id)) + 1 : 1;
