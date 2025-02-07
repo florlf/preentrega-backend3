@@ -1,23 +1,42 @@
-# Proyecto Carrito de Compras - Pre-entrega 1
+# Proyecto: Sistema de Manejo de Productos y Carrito de Compras - Pre-Entrega 2 - Backend
 
-Este es un servidor implementado en **Node.js** y **Express** que simula un sistema de manejo de productos y carritos de compras. La persistencia de datos se realiza utilizando archivos JSON para almacenar los productos y carritos.
+Este proyecto simula un sistema de manejo de productos y carritos de compras utilizando **Node.js** y **Express**. La persistencia de datos se realiza con archivos **JSON** para almacenar los productos y carritos. Además, se integró la visualización en tiempo real de los productos usando **Websockets** y el motor de plantillas **Handlebars**.
 
+## Características:
+- Se implementa una API para gestionar productos.
+- Se incluye un sistema de carritos de compras.
+- Visualización de productos en tiempo real utilizando Websockets.
+- Se pueden agregar y eliminar productos de manera dinámica con actualización automática en la vista.
 
-El servidor proporciona dos grupos de rutas:
-
-1. **/products**: Permite gestionar los productos.
-2. **/carts**: Permite gestionar los carritos de compras.
 
 ## Tecnologías Utilizadas
 
 - **Node.js** (https://nodejs.org/en/docs/) 
 - **Express.js** (https://expressjs.com/)
+- **Socket.io** (https://socket.io/docs/v4/)
+- **Handlebars** (https://handlebarsjs.com/)
 - **File System (fs)**
 - **JSON**
 
-## Endpoints
+## Rutas y Endpoints
 
-### /api/products
+### Rutas con Websockets
+
+**1. /realtimeproducts:** Vista en tiempo real de los productos. Cada vez que se agrega o elimina un producto, la vista se actualiza automáticamente usando Websockets.
+
+- Esta ruta permite la visualización de productos y la interacción en tiempo real (agregar/eliminar productos).
+- La vista se carga utilizando el motor de plantillas Handlebars.
+- Para agregar un producto, se utiliza un formulario, y para eliminarlo, un botón "Eliminar" está disponible junto a cada producto.
+
+**2. /products:** Lista de todos los productos.
+
+- Visualiza todos los productos a través de una solicitud HTTP (GET).
+- La vista utiliza Handlebars para renderizar los productos.
+
+
+### Endpoints de la API (HTTP)
+
+#### /api/products
 
 1. **GET /api/products/**
 
@@ -66,7 +85,7 @@ El servidor proporciona dos grupos de rutas:
    Elimina un producto con el ID proporcionado. Si no se encuentra el producto, se responde con un error 404.
 
 
-### /api/carts
+#### /api/carts
 
 1. **POST /api/carts/**
    
