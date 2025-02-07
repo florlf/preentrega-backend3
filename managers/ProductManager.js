@@ -1,12 +1,14 @@
 const fs = require("fs/promises");
+const path = require('path');
 
 class ProductManager {
-  constructor(path) {
-    this.path = path;
+  constructor() {
+    this.path = path.join(__dirname, '..', 'data', 'productos.json');
   }
 
   async getProducts(limit) {
     const data = await this._readFile();
+    console.log("Productos leídos:", data);
     return limit ? data.slice(0, limit) : data;
   }
 
@@ -14,7 +16,7 @@ class ProductManager {
     const data = await this._readFile();
     const idNumber = Number(id);
     return data.find((p) => p.id === idNumber);
-  }    
+  }
 
   async addProduct(product) {
     const data = await this._readFile();
@@ -27,9 +29,7 @@ class ProductManager {
 
   async updateProduct(id, updatedData) {
     const data = await this._readFile();
-    
     const idNumber = Number(id);
-    
     const index = data.findIndex((p) => p.id === idNumber);
   
     if (index === -1) {
@@ -37,7 +37,6 @@ class ProductManager {
     }
   
     data[index] = { ...data[index], ...updatedData };
-  
     await this._writeFile(data);
     
     return data[index];
@@ -46,10 +45,9 @@ class ProductManager {
   async deleteProduct(id) {
     const data = await this._readFile();
     const idNumber = Number(id);
-    
     const filtered = data.filter((p) => p.id !== idNumber);
     await this._writeFile(filtered);
-  }  
+  }
 
   async _readFile() {
     try {
@@ -67,7 +65,7 @@ class ProductManager {
 
   _generateId(data) {
     return data.length ? Math.max(...data.map((p) => p.id)) + 1 : 1;
-  }  
+  }
 }
 
 module.exports = ProductManager;
