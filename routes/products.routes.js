@@ -15,12 +15,7 @@ router.get('/', async (req, res) => {
       query
     });
 
-    res.render('products', {
-      ...result,
-      sort: sort || '',
-      query: query || '',
-      cartId: req.session.cartId
-    });
+    res.status(200).json(result); // <-- Corregido
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -32,7 +27,6 @@ router.get('/:pid', async (req, res) => {
   else res.status(404).json({ error: 'Producto no encontrado' });
 });
 
-// POST corregido
 router.post('/', async (req, res) => {
   try {
     const productData = req.body;
@@ -59,7 +53,6 @@ router.put('/:pid', async (req, res) => {
   }
 });
 
-// DELETE corregido
 router.delete('/:pid', async (req, res) => {
   try {
     await productManager.deleteProduct(req.params.pid);
