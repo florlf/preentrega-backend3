@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
       query
     });
 
-    res.status(200).json(result); // <-- Corregido
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
