@@ -8,7 +8,7 @@ Este proyecto es un sistema de manejo de productos y carritos de compras desarro
 
 - Endpoints para gestionar productos y carritos.
 
-- Paginación y Filtrado: Consultas con ordenamiento y filtros.
+- Consultas con ordenamiento y filtros.
 
 - Gestión de Carritos: Agregar, eliminar y actualizar productos en carritos.
 
