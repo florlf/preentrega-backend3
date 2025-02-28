@@ -1,7 +1,104 @@
+<h1>Productos</h1>
+
+<div>
+    <a href="/carts/{{cartId}}">Ver carrito</a>
+</div>
+
+<div>
+  <a href="/realtimeproducts">Productos en tiempo real</a>
+</div>
+
+<div>
+  <label for="category">Filtrar por categoría:</label>
+  <select id="category" onchange="applyFilters()">
+    <option value="">Todas</option>
+    <option value="Apple" {{#eq query "Apple"}}selected{{/eq}}>Apple</option>
+    <option value="Teclados" {{#eq query "Teclados"}}selected{{/eq}}>Teclados</option>
+  </select>
+
+  <label for="sort">Ordenar por precio:</label>
+  <select id="sort" onchange="applyFilters()">
+    <option value="">Sin orden</option>
+    <option value="asc" {{#if (eq sort 'asc')}}selected{{/if}}>Menor a mayor</option>
+    <option value="desc" {{#if (eq sort 'desc')}}selected{{/if}}>Mayor a menor</option>
+  </select>
+</div>
+
 <ul>
-    {{#each products}}
-        <li>{{this.title}} - ${{this.price}}</li>
+    {{#each payload}}
+        <li>
+            <strong>{{this.title}}</strong> - ${{this.price}}
+            <p>{{this.description}}</p>
+            <p>Stock: {{this.stock}}</p>
+            <img src="{{this.thumbnail}}" alt="{{this.title}}" width="200">
+            <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+        </li>
     {{else}}
         <p>No hay productos disponibles.</p>
     {{/each}}
 </ul>
+
+{{#if hasPrevPage}}
+    <a href="{{prevLink}}">Anterior</a>
+{{/if}}
+{{#if hasNextPage}}
+    <a href="{{nextLink}}">Siguiente</a>
+{{/if}}
+
+<script>
+    function setSelectValuesFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+            
+        const category = urlParams.get('query');
+        if (category) {
+            document.getElementById('category').value = category;
+        }
+            
+        const sort = urlParams.get('sort');
+        if (sort) {
+            document.getElementById('sort').value = sort;
+        }
+    }
+
+    function applyFilters() {
+        const category = document.getElementById('category').value;
+        const sort = document.getElementById('sort').value;
+
+        const url = new URL(window.location.href);
+
+        if (category) {
+            url.searchParams.set('query', category);
+        } else {
+            url.searchParams.delete('query');
+            if (url.pathname !== '/products') url.pathname = '/products';
+        }
+
+        if (sort) {
+            url.searchParams.set('sort', sort);
+        } else {
+            url.searchParams.delete('sort');
+        }
+
+        url.searchParams.delete('page');
+
+        window.location.href = url.toString();
+    }
+
+    async function addToCart(productId) {
+        try {
+            const response = await fetch(`/api/carts/{{cartId}}/product/${productId}`, {
+                method: 'POST',
+            });
+            const data = await response.json();
+            console.log('Producto agregado al carrito:', data);
+            alert('Producto agregado al carrito');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al agregar el producto al carrito');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    setSelectValuesFromURL();
+    });
+</script>

@@ -1,52 +1,35 @@
-const { Router } = require("express");
-const CartManager = require("../managers/CartManager");
+const { Router } = require('express');
+const CartManager = require('../managers/CartManager');
 
 const router = Router();
-const cartManager = new CartManager("./data/carrito.json");
+const cartManager = new CartManager();
 
-router.post("/", async (req, res) => {
-  const newCart = await cartManager.createCart();
-  res.status(201).json(newCart);
-});
-
-
-router.get("/:cid", async (req, res) => {
-  const { cid } = req.params;
-  const cartId = Number(cid);
-  
-  const cart = await cartManager.getCartById(cartId);
-  
-  if (cart) res.json(cart);
-  else res.status(404).json({ error: "Carrito no encontrado" });
-});
-
-
-router.post("/:cid/product/:pid", async (req, res) => {
+router.post('/:cid/product/:pid', async (req, res) => {
   const { cid, pid } = req.params;
-  const cartId = Number(cid);
-  const productId = Number(pid);
-
   try {
-    const updatedCart = await cartManager.addProductToCart(cartId, productId);
+    const updatedCart = await cartManager.addProductToCart(cid, pid);
     res.json(updatedCart);
   } catch (error) {
+    console.error('Error al agregar producto al carrito:', error);
     res.status(400).json({ error: error.message });
   }
 });
 
 
-router.delete("/:cid", async (req, res) => {
-  const { cid } = req.params;
+router.delete('/:cid/products/:pid', async (req, res) => {
+  const { cid, pid } = req.params;
+  const { quantity } = req.query;
 
   try {
-    const result = await cartManager.deleteCart(cid);
-    if (result) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ error: "Carrito no encontrado" });
-    }
+    const updatedCart = await cartManager.removeProductFromCart(
+      cid,
+      pid,
+      quantity ? parseInt(quantity) : 1
+    );
+    res.json(updatedCart);
   } catch (error) {
-    res.status(500).json({ error: "Error al eliminar el carrito" });
+    console.error('Error al eliminar producto del carrito:', error);
+    res.status(400).json({ error: error.message });
   }
 });
 

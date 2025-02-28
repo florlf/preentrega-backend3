@@ -1,36 +1,54 @@
-const { Router } = require("express");
-const ProductManager = require("../managers/ProductManager");
+const { Router } = require('express');
+const ProductManager = require('../managers/ProductManager');
 
 const router = Router();
-const productManager = new ProductManager("./data/productos.json");
+const productManager = new ProductManager();
 
-router.get("/", async (req, res) => {
-  const limit = req.query.limit;
-  const products = await productManager.getProducts(limit);
-  res.json(products);
-});
-
-
-router.get("/:pid", async (req, res) => {
-  const { pid } = req.params;
-  const product = await productManager.getProductById(pid);
-  if (product) res.json(product);
-  else res.status(404).json({ error: "Producto no encontrado" });
-});
-
-
-router.post("/", async (req, res) => {
-  const newProduct = req.body;
+router.get('/', async (req, res) => {
   try {
-    const product = await productManager.addProduct(newProduct);
-    res.status(201).json(product);
+    const { limit = 10, page = 1, sort, query } = req.query;
+    
+    const result = await productManager.getProducts({
+      limit,
+      page,
+      sort,
+      query
+    });
+
+    res.render('products', {
+      ...result,
+      sort: sort || '',
+      query: query || '',
+      cartId: req.session.cartId
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/:pid', async (req, res) => {
+  const product = await productManager.getProductById(req.params.pid);
+  if (product) res.json(product);
+  else res.status(404).json({ error: 'Producto no encontrado' });
+});
+
+// POST corregido
+router.post('/', async (req, res) => {
+  try {
+    const productData = req.body;
+    const newProduct = await productManager.addProduct(productData);
+    
+    const io = req.app.get('io');
+    const result = await productManager.getProducts({});
+    io.emit('updateProducts', result.payload);
+    
+    res.status(201).json(newProduct);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-
-router.put("/:pid", async (req, res) => {
+router.put('/:pid', async (req, res) => {
   const { pid } = req.params;
   const updatedData = req.body;
   try {
@@ -41,12 +59,16 @@ router.put("/:pid", async (req, res) => {
   }
 });
 
-
-router.delete("/:pid", async (req, res) => {
-  const { pid } = req.params;
+// DELETE corregido
+router.delete('/:pid', async (req, res) => {
   try {
-    await productManager.deleteProduct(pid);
-    res.status(204).send();
+    await productManager.deleteProduct(req.params.pid);
+    
+    const io = req.app.get('io');
+    const result = await productManager.getProducts({});
+    io.emit('updateProducts', result.payload);
+    
+    res.json({ message: 'Producto eliminado' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

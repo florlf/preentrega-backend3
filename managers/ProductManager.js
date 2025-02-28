@@ -1,70 +1,60 @@
-const fs = require("fs/promises");
-const path = require('path');
+const Product = require('../models/Product');
 
 class ProductManager {
-  constructor() {
-    this.path = path.join(__dirname, '..', 'data', 'productos.json');
-  }
+  async getProducts({ limit = 10, page = 1, sort, query }) {
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {},
+      lean: true,
+    };
 
-  async getProducts(limit) {
-    const data = await this._readFile();
-    console.log("Productos leídos:", data);
-    return limit ? data.slice(0, limit) : data;
+    const filter = query && query !== 'undefined' && query !== '' ? { category: query } : {};
+
+    const result = await Product.paginate(filter, options);
+
+    const buildLink = (targetPage) => {
+      const params = new URLSearchParams();
+      params.set('limit', limit);
+      params.set('page', targetPage);
+      if (query && query !== 'undefined') params.set('query', query);
+      if (sort) params.set('sort', sort);
+      return `/products?${params.toString()}`;
+    };
+
+    return {
+      status: 'success',
+      payload: result.docs,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage ? buildLink(result.prevPage) : null,
+      nextLink: result.hasNextPage ? buildLink(result.nextPage) : null,
+    };
   }
 
   async getProductById(id) {
-    const data = await this._readFile();
-    const idNumber = Number(id);
-    return data.find((p) => p.id === idNumber);
+    return await Product.findById(id).lean();
   }
 
   async addProduct(product) {
-    const data = await this._readFile();
-    const id = this._generateId(data);
-    const newProduct = { id, ...product, status: true };
-    data.push(newProduct);
-    await this._writeFile(data);
-    return newProduct;
+    const newProduct = new Product({
+      title: product.title,
+      description: product.description,
+      code: product.code,
+      price: product.price,
+      stock: product.stock,
+      category: product.category,
+      thumbnail: product.thumbnail || '',
+    });
+    return await newProduct.save();
   }
 
   async updateProduct(id, updatedData) {
-    const data = await this._readFile();
-    const idNumber = Number(id);
-    const index = data.findIndex((p) => p.id === idNumber);
-  
-    if (index === -1) {
-      return null;
-    }
-  
-    data[index] = { ...data[index], ...updatedData };
-    await this._writeFile(data);
-    
-    return data[index];
+    return await Product.findByIdAndUpdate(id, updatedData, { new: true }).lean();
   }
 
   async deleteProduct(id) {
-    const data = await this._readFile();
-    const idNumber = Number(id);
-    const filtered = data.filter((p) => p.id !== idNumber);
-    await this._writeFile(filtered);
-  }
-
-  async _readFile() {
-    try {
-      const data = await fs.readFile(this.path, "utf-8");
-      return JSON.parse(data);
-    } catch (error) {
-      console.log("Error leyendo archivo:", error);
-      return [];
-    }
-  }
-
-  async _writeFile(data) {
-    await fs.writeFile(this.path, JSON.stringify(data, null, 2));
-  }
-
-  _generateId(data) {
-    return data.length ? Math.max(...data.map((p) => p.id)) + 1 : 1;
+    return await Product.findByIdAndDelete(id);
   }
 }
 

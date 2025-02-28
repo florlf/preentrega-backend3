@@ -1,79 +1,72 @@
-const fs = require("fs/promises");
+const Cart = require('../models/Cart');
+const { Types } = require('mongoose');
 
 class CartManager {
-  constructor(path) {
-    this.path = path;
-  }
-
   async createCart() {
-    const data = await this._readFile();
-    const newCart = { 
-      id: this._generateId(data),
-      products: []
-    };
-    data.push(newCart);
-    await this._writeFile(data);
-    return newCart;
+    const newCart = new Cart({ products: [] });
+    return await newCart.save();
   }
 
   async getCartById(id) {
-    const data = await this._readFile();
-    const idNumber = Number(id);
-    return data.find((cart) => cart.id === idNumber);
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error('ID de carrito no válido');
+    }
+    return await Cart.findById(id)
+      .populate('products.product', 'title price')
+      .lean();
   }
 
-  async addProductToCart(cartId, productId) {
-    const data = await this._readFile();
-    const idNumber = Number(cartId);
-    const cart = data.find((cart) => cart.id === idNumber);
-  
-    if (!cart) throw new Error("Carrito no encontrado");
-  
-    const productIdNumber = Number(productId);
-    const productIndex = cart.products.findIndex(
-      (product) => product.product === productIdNumber
-    );
-  
-    if (productIndex === -1) {
-      cart.products.push({ product: productIdNumber, quantity: 1 });
-    } else {
-      cart.products[productIndex].quantity += 1;
+  async removeProductFromCart(cartId, productId, quantityToRemove = 1) {
+    if (!Types.ObjectId.isValid(cartId) || !Types.ObjectId.isValid(productId)) {
+      throw new Error('ID de carrito o producto no válido');
     }
-  
-    await this._writeFile(data);
+
+    const cart = await Cart.findById(cartId);
+    if (!cart) {
+      throw new Error('Carrito no encontrado');
+    }
+
+    const productIndex = cart.products.findIndex(
+      (p) => p.product.toString() === productId
+    );
+
+    if (productIndex === -1) {
+      throw new Error('Producto no encontrado en el carrito');
+    }
+
+    if (quantityToRemove >= cart.products[productIndex].quantity) {
+      cart.products.splice(productIndex, 1);
+    } else {
+      cart.products[productIndex].quantity -= quantityToRemove;
+    }
+
+    await cart.save();
     return cart;
   }
 
-  async deleteCart(id) {
-    const data = await this._readFile();
-    
-    const index = data.findIndex((cart) => cart.id === Number(id));
-    if (index === -1) {
-      return null;
+  async addProductToCart(cartId, productId) {
+    if (!Types.ObjectId.isValid(cartId) || !Types.ObjectId.isValid(productId)) {
+      throw new Error('ID de carrito o producto no válido');
     }
-    
-    data.splice(index, 1);
-    
-    await this._writeFile(data);
-    
-    return true;
-  }
-  
-  async _readFile() {
-    try {
-      const data = await fs.readFile(this.path, "utf-8");
-      return JSON.parse(data);
-    } catch {
-      return [];
+
+    let cart = await Cart.findById(cartId);
+    if (!cart) {
+      cart = new Cart({ _id: cartId, products: [] });
+      await cart.save();
     }
-  }
 
-  async _writeFile(data) {
-    await fs.writeFile(this.path, JSON.stringify(data, null, 2));
-  }
+    const productIndex = cart.products.findIndex(
+      (p) => p.product.toString() === productId
+    );
 
-  _generateId(data) {
-    return data.length ? Math.max(...data.map((cart) => cart.id)) + 1 : 1;
+    if (productIndex === -1) {
+      cart.products.push({ product: productId, quantity: 1 });
+    } else {
+      cart.products[productIndex].quantity += 1;
+    }
+
+    await cart.save();
+    return cart;
   }
 }
 
