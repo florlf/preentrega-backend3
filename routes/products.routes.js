@@ -7,19 +7,23 @@ const productManager = new ProductManager();
 router.get('/', async (req, res) => {
   try {
     const { limit = 10, page = 1, sort, query } = req.query;
-    
-    const result = await productManager.getProducts({
-      limit,
-      page,
-      sort,
-      query
-    });
 
-    res.status(200).json(result);
+    const product = await productManager.getProducts({ limit, page, sort, query });
+
+    res.render('index', {
+      payload: product.payload,
+      hasPrevPage: product.hasPrevPage,
+      hasNextPage: product.hasNextPage,
+      prevLink: product.prevLink,
+      nextLink: product.nextLink,
+      cartId: req.session.cartId,
+      user: req.user,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get('/:pid', async (req, res) => {
   const product = await productManager.getProductById(req.params.pid);
@@ -66,5 +70,6 @@ router.delete('/:pid', async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 
 module.exports = router;

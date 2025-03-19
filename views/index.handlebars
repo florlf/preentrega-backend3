@@ -1,6 +1,17 @@
 <h1>Productos</h1>
 
 <div>
+  {{#if user}}
+    <p>Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
+    <a href="/profile">Ver perfil</a>
+    <a href="/api/sessions/logout">Cerrar sesión</a>
+  {{else}}
+    <a href="/login">Iniciar sesión</a>
+    <a href="/register">Registrarse</a>
+  {{/if}}
+</div>
+
+<div>
     <a href="/carts/{{cartId}}">Ver carrito</a>
 </div>
 

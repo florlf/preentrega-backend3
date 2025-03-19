@@ -7,11 +7,17 @@ const http = require('http');
 const socketIo = require('socket.io');
 const session = require('express-session');
 const Cart = require('./models/Cart');
-
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+require('./config/passport');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const Product = require('./models/Product');
+const productRoutes = require('./routes/products.routes');
+const authRoutes = require('./routes/auth.routes');
+const cors = require('cors');
+
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado a MongoDB Atlas'))
@@ -36,7 +42,7 @@ app.set('io', io);
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 app.use(
   session({
     secret: 'secreto',
@@ -44,6 +50,16 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(cors({
+  origin: 'http://localhost:8080',
+  credentials: true,
+}));
+
+app.use('/products', productRoutes);
 
 app.use(async (req, res, next) => {
   if (!req.session.cartId) {
@@ -59,9 +75,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/sessions', authRoutes);
 app.use('/api/products', require('./routes/products.routes'));
 app.use('/api/carts', require('./routes/carts.routes'));
-
 app.use('/', require('./routes/views.router'));
 
 app.get('/', (req, res) => {
