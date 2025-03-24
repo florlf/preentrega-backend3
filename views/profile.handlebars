@@ -1,7 +1,7 @@
 <h1>Perfil de Usuario</h1>
 <div id="userInfo">
-  <p><strong>Nombre:</strong> <span id="firstName"></span></p>
-  <p><strong>Apellido:</strong> <span id="lastName"></span></p>
+  <p><strong>Nombre:</strong> <span id="first_name"></span></p>
+  <p><strong>Apellido:</strong> <span id="last_name"></span></p>
   <p><strong>Email:</strong> <span id="email"></span></p>
   <p><strong>Rol:</strong> <span id="role"></span></p>
 </div>
@@ -20,8 +20,8 @@
 
     if (response.ok) {
       const user = await response.json();
-      document.getElementById('firstName').textContent = user.first_name;
-      document.getElementById('lastName').textContent = user.last_name;
+      document.getElementById('first_name').textContent = user.first_name;
+      document.getElementById('last_name').textContent = user.last_name;
       document.getElementById('email').textContent = user.email;
       document.getElementById('role').textContent = user.role;
     } else {

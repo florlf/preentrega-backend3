@@ -47,9 +47,9 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, 'jwt_secret', { expiresIn: '1h' });
     res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-    res.status(200).json({ message: 'Login exitoso', token });
+
+    res.render('profile', { user: user });  // Opción 2: renderizar la vista
   } catch (err) {
-    console.error('Error en el login:', err);
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
@@ -59,4 +59,17 @@ exports.logout = (req, res) => {
   res.clearCookie('jwt');
   // Redirigir a la página de inicio o login después de cerrar sesión
   res.redirect('/login');
+};
+
+exports.home = (req, res) => {
+  if (req.user) { // Si el usuario está autenticado
+    res.render('index', {
+      user: req.user,  // Pasa los datos del usuario
+      isAuthenticated: true,  // Indica que el usuario está autenticado
+    });
+  } else {
+    res.render('index', {
+      isAuthenticated: false,  // Si no está autenticado
+    });
+  }
 };
