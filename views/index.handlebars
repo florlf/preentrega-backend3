@@ -1,8 +1,7 @@
 <h1>Productos</h1>
 <div>
-  {{#if user}} <!-- Solo muestra esto si el usuario está autenticado -->
+  {{#if user}}
     <p>Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
-    <!-- Mostrar el botón de perfil solo si el rol es "user" -->
     {{#if (eq user.role 'user')}}
       <a href="/profile">
         <button>Ir a mi perfil</button>

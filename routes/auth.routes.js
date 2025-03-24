@@ -7,9 +7,8 @@ router.post('/login', authController.login);
 
 router.post('/register', authController.register);
 
-// Asegúrate de que el usuario esté autenticado usando JWT
 router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
-  res.json(req.user);  // Devolvemos los datos del usuario autenticado
+  res.json(req.user);
 });
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {

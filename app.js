@@ -59,7 +59,6 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use('/products', productRoutes);
 
 app.use(async (req, res, next) => {
   if (!req.session.cartId) {
@@ -75,10 +74,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/sessions', authRoutes);
-app.use('/api/products', require('./routes/products.routes'));
-app.use('/api/carts', require('./routes/carts.routes'));
 app.use('/', require('./routes/views.router'));
+
+app.use('/api/products', require('./routes/products.routes'));
+app.use('/api/sessions', authRoutes);
+app.use('/api/carts', require('./routes/carts.routes'));
 
 app.get('/', (req, res) => {
   res.redirect('/products');

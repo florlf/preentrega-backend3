@@ -15,7 +15,7 @@ exports.register = async (req, res) => {
       first_name,
       last_name,
       email,
-      password,  // No hace falta hacer hash aquí
+      password,
     });
 
     await newUser.save();
@@ -35,41 +35,50 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }
 
-    console.log('Contraseña ingresada:', password);
-    console.log('Contraseña hasheada en la DB:', user.password);
-
-    const isMatch = await bcrypt.compare(password, user.password); // Usa await aquí
-    console.log('¿Coinciden las contraseñas?', isMatch);
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign({ id: user._id }, 'jwt_secret', { expiresIn: '1h' });
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+    const token = jwt.sign(
+      { 
+        id: user._id,
+        role: user.role
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
+    res.cookie('jwt', token, { 
+      httpOnly: true, 
+      maxAge: 3600000,
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production'
+    });
 
-    res.render('profile', { user: user });  // Opción 2: renderizar la vista
+
+    res.redirect('/products');
   } catch (err) {
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
 
 exports.logout = (req, res) => {
-  // Eliminar la cookie JWT
+
   res.clearCookie('jwt');
-  // Redirigir a la página de inicio o login después de cerrar sesión
+
   res.redirect('/login');
 };
 
 exports.home = (req, res) => {
-  if (req.user) { // Si el usuario está autenticado
+  if (req.user) {
     res.render('index', {
-      user: req.user,  // Pasa los datos del usuario
-      isAuthenticated: true,  // Indica que el usuario está autenticado
+      user: req.user,
+      isAuthenticated: true,
     });
   } else {
     res.render('index', {
-      isAuthenticated: false,  // Si no está autenticado
+      isAuthenticated: false,
     });
   }
 };

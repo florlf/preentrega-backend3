@@ -8,24 +8,19 @@ const pm = new ProductManager();
 const cm = new CartManager();
 
 function optionalAuth(req, res, next) {
+  console.log("Middleware ejecutándose");
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err) {
-      // Aquí puedes manejar el error, si lo necesitas
-      console.log('Error en la autenticación JWT:', err);
+      console.error('Error en optionalAuth:', err);
     }
-    
-    if (user) {
-      req.user = user; // Si el usuario está autenticado, asignamos 'user' a 'req.user'
-    } else {
-      req.user = null; // Si no hay usuario, aseguramos que 'req.user' sea 'null'
-    }
-    
-    next(); // Continuamos al siguiente middleware o ruta
+    console.log('Usuario desde JWT:', user);
+    req.user = user || null;
+    next();
   })(req, res, next);
 }
 
 router.get('/products', optionalAuth, async (req, res) => {
-  console.log('Usuario autenticado:', req.user);  // Añadir esta línea
+  console.log('Usuario autenticado:', req.user);
   const { limit, page, sort, query } = req.query;
   const result = await pm.getProducts({ limit, page, sort, query });
   res.render('index', { ...result, title: "Productos", user: req.user || null });
