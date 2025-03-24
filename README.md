@@ -1,6 +1,6 @@
 # Proyecto: Sistema de Manejo de Productos y Carrito de Compras
 
-Este proyecto es un sistema de manejo de productos y carritos de compras desarrollado con **Node.js**, **Express**, **MongoDB** y **Mongoose**. Incluye gestión de productos y carritos, con funcionalidades avanzadas como paginación, filtrado y ordenamiento según precio ascendente o descendente. Además, se integró la visualización en tiempo real de los productos usando **Websockets** y **Handlebars**.
+Este proyecto es un sistema de manejo de productos y carritos de compras desarrollado con **Node.js**, **Express**, **MongoDB** y **Mongoose**. Incluye gestión de productos y carritos, con funcionalidades avanzadas como paginación, filtrado y ordenamiento según precio ascendente o descendente. Se integró la visualización en tiempo real de los productos usando **Websockets** y **Handlebars**, además de un Register, Login y Perfil de usuario donde se les permite a los usuarios cerrar sesión.
 
 ## Características:
 
@@ -16,6 +16,12 @@ Este proyecto es un sistema de manejo de productos y carritos de compras desarro
 
 - Vistas con Handlebars: Renderizado de productos y carritos.
 
+- Validación de campos y hashing de contraseñas con bcrypt.
+
+- Persistencia de sesión con JWT (JSON Web Tokens).
+
+- Sistema de Roles: Rol user (usuario normal) y admin (acceso total, se agregará posteriormente). Vistas condicionales según rol (ej: solo user ve su perfil). Rutas protegidas con Passport JWT Strategy.
+
 
 ## Tecnologías Utilizadas
 
@@ -25,6 +31,9 @@ Este proyecto es un sistema de manejo de productos y carritos de compras desarro
 - **Mongoose** (https://mongoosejs.com/)
 - **Socket.io** (https://socket.io/docs/v4/)
 - **Handlebars** (https://handlebarsjs.com/)
+- **JWT** (https://auth0.com/docs/secure/tokens/json-web-tokens)
+- **Passport.js** (https://www.passportjs.org/docs/)
+- **bcrypt** (https://www.npmjs.com/package/bcrypt)
 
 ## Configuración del Proyecto
 ### Requisitos Previos
@@ -35,6 +44,8 @@ Este proyecto es un sistema de manejo de productos y carritos de compras desarro
 
 - Postman (para probar los endpoints de la API).
 
+- Dependencias instaladas.
+
 ### Instalación
 
 **1. Clonar el repositorio**
@@ -43,7 +54,7 @@ Este proyecto es un sistema de manejo de productos y carritos de compras desarro
 
 **3. Configurar la conexión a MongoDB**
 Este proyecto utiliza una base de datos en *MongoDB Atlas*.
-Se debe *crear un archivo .env* con la *URI de conexión* enviada por mensaje privado (al ser una credencial sensible, no se subirá al repositorio) para testear las funcionalidades del proyecto, ya que este usuario *permite la lectura y escritura de la DB*.
+Se debe *crear un archivo .env* con la *URI de conexión* y el *JWT_SECRET* enviados por mensaje privado (al ser credenciales sensibles, no se subirán al repositorio) para testear las funcionalidades del proyecto, ya que este usuario *permite la lectura y escritura de la DB*.
 
 Además, la base de datos está configurada para permitir el acceso desde cualquier IP (0.0.0.0/0), por lo que *no es necesario configurar IPs específicas*.
 
