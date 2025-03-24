@@ -53,3 +53,10 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
+
+exports.logout = (req, res) => {
+  // Eliminar la cookie JWT
+  res.clearCookie('jwt');
+  // Redirigir a la página de inicio o login después de cerrar sesión
+  res.redirect('/login');
+};
