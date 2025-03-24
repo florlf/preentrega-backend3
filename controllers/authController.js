@@ -11,13 +11,11 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
-    const hashedPassword = bcrypt.hash(password, 10);
-
     const newUser = new User({
       first_name,
       last_name,
       email,
-      password: hashedPassword,
+      password,  // No hace falta hacer hash aquí
     });
 
     await newUser.save();
@@ -37,7 +35,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }
 
-    const isMatch = bcrypt.compare(password, user.password);
+    console.log('Contraseña ingresada:', password);
+    console.log('Contraseña hasheada en la DB:', user.password);
+
+    const isMatch = await bcrypt.compare(password, user.password); // Usa await aquí
+    console.log('¿Coinciden las contraseñas?', isMatch);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });

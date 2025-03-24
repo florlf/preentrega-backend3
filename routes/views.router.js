@@ -7,11 +7,20 @@ const CartManager = require('../managers/CartManager');
 const pm = new ProductManager();
 const cm = new CartManager();
 
-router.get('/products', async (req, res) => {
+function optionalAuth(req, res, next) {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (user) req.user = user;
+    return next();
+  })(req, res, next);
+}
+
+router.get('/products', optionalAuth, async (req, res) => {
   const { limit, page, sort, query } = req.query;
   const result = await pm.getProducts({ limit, page, sort, query });
   res.render('index', { ...result, title: "Productos", user: req.user || null });
 });
+
+//lo cambie
 
 router.get('/products/:pid', async (req, res) => {
   const product = await pm.getProductById(req.params.pid);

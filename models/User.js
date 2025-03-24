@@ -10,17 +10,20 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: 'user' }
 });
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', async function(next) { // Usar async
   const user = this;
 
+  // Si la contraseña no se modifica, no hace falta hashearla de nuevo
   if (!user.isModified('password')) return next();
 
-  bcrypt.hash(user.password, 10, (err, hash) => {
-    if (err) return next(err);
-
-    user.password = hash;
+  try {
+    // Usamos await para que la promesa se resuelva antes de continuar
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    user.password = hashedPassword;
     next();
-  });
+  } catch (err) {
+    next(err); // Pasar el error si ocurre
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);
