@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const Cart = require('../models/Cart');
 
 exports.register = async (req, res) => {
   try {
@@ -17,6 +18,15 @@ exports.register = async (req, res) => {
       email,
       password,
     });
+
+    const newCart = new Cart({
+      user: newUser._id,
+      products: []
+    });
+
+    await newCart.save();
+
+    newUser.cart = newCart._id;
 
     await newUser.save();
 
