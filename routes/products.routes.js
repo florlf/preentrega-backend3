@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const ProductManager = require('../managers/ProductManager');
+const { passportCall, authorization } = require('../middlewares/auth.middleware');
 
 const router = Router();
 const productManager = new ProductManager();
@@ -31,7 +32,10 @@ router.get('/:pid', async (req, res) => {
   else res.status(404).json({ error: 'Producto no encontrado' });
 });
 
-router.post('/', async (req, res) => {
+router.post('/', 
+  passportCall('jwt'), 
+  authorization(['admin']),
+  async (req, res) => {
   try {
     const productData = req.body;
     const newProduct = await productManager.addProduct(productData);
@@ -46,7 +50,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:pid', async (req, res) => {
+router.put('/:pid', 
+  passportCall('jwt'), 
+  authorization(['admin']),
+  async (req, res) => {
   const { pid } = req.params;
   const updatedData = req.body;
   try {
@@ -57,7 +64,10 @@ router.put('/:pid', async (req, res) => {
   }
 });
 
-router.delete('/:pid', async (req, res) => {
+router.delete('/:pid', 
+  passportCall('jwt'), 
+  authorization(['admin']),
+  async (req, res) => {
   try {
     await productManager.deleteProduct(req.params.pid);
     

@@ -1,24 +1,28 @@
 <h1>Productos</h1>
 <div>
   {{#if user}}
-    <p>Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
-    {{#if (eq user.role 'user')}}
+    <p>Bienvenido, {{user.first_name}} {{user.last_name}}! </p>
       <a href="/profile">
-        <button>Ir a mi perfil</button>
+        <button>Mi perfil</button>
       </a>
-    {{/if}}
   {{else}}
     <a href="/login">Iniciar sesión</a>
     <a href="/register">Registrarse</a>
   {{/if}}
 </div>
 
-<div>
-    <a href="/carts/{{cartId}}">Ver carrito</a>
-</div>
+{{#if user}}
+  <a href="/api/carts/mycart">
+    <button>Mi Carrito</button>
+  </a>
+{{/if}}
 
 <div>
-  <a href="/realtimeproducts">Productos en tiempo real</a>
+  {{#if user}}
+    {{#if (eq user.role 'admin')}}
+      <a href="/realtimeproducts">Productos en tiempo real (Admin)</a>
+    {{/if}}
+  {{/if}}
 </div>
 
 <div>

@@ -1,5 +1,7 @@
 const Cart = require('../models/Cart');
 const { Types } = require('mongoose');
+const Ticket = require('../models/Ticket');
+const Product = require('../models/Product');
 
 class CartManager {
   async createCart() {
@@ -120,6 +122,76 @@ class CartManager {
       throw new Error('Carrito no encontrado');
     }
     return cart;
+  }
+
+  async purchaseCart(cartId, userEmail) {
+    const cart = await Cart.findById(cartId)
+      .populate({
+        path: 'products.product',
+        model: 'Product',
+        select: 'title price stock'
+      })
+      .lean();
+      
+
+    // Validar carrito vacío
+    if (!cart.products || cart.products.length === 0) {
+      throw new Error('No hay productos en el carrito para comprar');
+    }
+    
+    const productsToPurchase = [];
+    const productsNotPurchased = [];
+    let totalAmount = 0;
+  
+    // Validación de stock mejorada
+    for (const item of cart.products) {
+      const product = await Product.findById(item.product._id);
+      
+      if (!product) {
+        productsNotPurchased.push(item.product._id);
+        continue;
+      }
+  
+      if (product.stock >= item.quantity) {
+        product.stock -= item.quantity;
+        await product.save();
+        
+        productsToPurchase.push({
+          product: item.product._id,
+          quantity: item.quantity,
+          price: product.price
+        });
+        
+        totalAmount += product.price * item.quantity;
+      } else {
+        productsNotPurchased.push(item.product._id.toString());
+      }
+    }
+
+    // Crear ticket con fecha formateada
+    const ticket = new Ticket({
+      code: `TKT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      purchase_datetime: new Date().toLocaleString('es-AR'),
+      amount: totalAmount,
+      purchaser: userEmail,
+      products: productsToPurchase
+    });
+    await ticket.save();
+
+    // Actualizar carrito con productos no procesados
+    await Cart.findByIdAndUpdate(
+      cartId,
+      { 
+        products: cart.products.filter(item => 
+          productsNotPurchased.includes(item.product._id.toString())
+        )
+      }
+    );
+
+    return {
+      ticket,
+      productsNotPurchased: productsNotPurchased.map(id => id.toString())
+    };
   }
 }
 

@@ -2,6 +2,37 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const Cart = require('../models/Cart');
+const UserDTO = require('../dto/User.dto');
+
+// Función para crear el admin si no existe
+const createAdminUser = async () => {
+  try {
+    const adminExists = await User.findOne({ email: 'admin@admin.com' });
+    if (!adminExists) {
+      const adminCart = new Cart({ products: [] });
+      await adminCart.save();
+      
+      // Guardar contraseña en texto plano (el hook la hasheará)
+      const adminUser = new User({
+        first_name: 'Admin',
+        last_name: 'Admin',
+        email: 'admin@admin.com',
+        password: 'admin', // ← Texto plano
+        cart: adminCart._id,
+        role: 'admin'
+      });
+      
+      await adminUser.save();
+      console.log('✅ Admin creado');
+    }
+  } catch (error) {
+    console.error('Error creando admin:', error);
+    process.exit(1);
+  }
+};
+
+// Llama a esta función cuando se inicie el servidor
+createAdminUser();
 
 exports.register = async (req, res) => {
   try {
@@ -12,21 +43,18 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
+    // Crear carrito primero
+    const newCart = new Cart({ products: [] });
+    await newCart.save();
+
+    // Crear usuario con el carrito asignado
     const newUser = new User({
       first_name,
       last_name,
       email,
       password,
+      cart: newCart._id // Asignar el carrito creado
     });
-
-    const newCart = new Cart({
-      user: newUser._id,
-      products: []
-    });
-
-    await newCart.save();
-
-    newUser.cart = newCart._id;
 
     await newUser.save();
 

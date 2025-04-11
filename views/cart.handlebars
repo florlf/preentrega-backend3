@@ -1,6 +1,7 @@
-<h1>Carrito</h1>
-<ul>
-    {{#each products}}
+<h1>Mi Carrito</h1>
+{{#if cart.products.length}}
+  <ul>
+    {{#each cart.products}}
         <li>
             <strong>{{this.product.title}}</strong> 
             <p>${{this.product.price}}</p>
@@ -11,7 +12,23 @@
     {{else}}
         <p>No hay productos en el carrito.</p>
     {{/each}}
-</ul>
+  </ul>
+  <h3>Total del carrito: ${{totalCart cart.products}}</h3>
+{{else}}
+  <p>🛒 Tu carrito está vacío</p>
+{{/if}}
+
+
+{{#if user}}
+  {{#if cart.products.length}}
+    <button onclick="purchaseCart()" class="btn btn-success">Finalizar Compra</button>
+  {{else}}
+    <p class="text-muted">Agrega productos para comprar</p>
+  {{/if}}
+{{else}}
+  <p>🔒 Debes <a href="/login">iniciar sesión</a> para comprar</p>
+{{/if}}
+
 
 <div style="margin-top: 20px;">
   <a href="/products">Volver a inicio</a>
@@ -29,6 +46,31 @@
         } catch (error) {
             console.error('Error:', error);
             alert('Error al eliminar el producto del carrito');
+        }
+    }
+
+    async function purchaseCart() {
+        try {
+            // Validación adicional en frontend
+            if (!{{cart.products.length}}) {
+                throw new Error('El carrito está vacío');
+            }
+
+            const response = await fetch(`/api/carts/{{cart._id}}/purchase`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                alert(`Ticket de compra: ${result.ticket.code}\nTotal: $${result.ticket.amount}`);
+                window.location.href = '/products';
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert(`Error: ${error.message}`);
         }
     }
 </script>

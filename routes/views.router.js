@@ -37,18 +37,26 @@ router.get('/carts/:cid', async (req, res) => {
   res.render('cart', { products: cart.products, title: "Carrito", user: req.user || null });
 });
 
-router.get('/realtimeproducts', async (req, res) => {
-  try {
-    const products = await pm.getProducts({});
-    res.render('realTimeProducts', { 
-      products: products.payload,
-      title: "Productos en Tiempo Real",
-      user: req.user || null
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+router.get('/realtimeproducts', 
+  passport.authenticate('jwt', { session: false }), 
+  async (req, res) => {
+    try {
+      // Verificar si es admin
+      if (req.user.role !== 'admin') {
+        return res.redirect('/products');
+      }
+
+      const products = await pm.getProducts({});
+      res.render('realTimeProducts', { 
+        products: products.payload,
+        title: "Productos en Tiempo Real",
+        user: req.user
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
   res.render('profile', { user: req.user });

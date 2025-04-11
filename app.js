@@ -10,6 +10,7 @@ const Cart = require('./models/Cart');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 require('./config/passport');
+require('./models/Ticket');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -70,14 +71,13 @@ app.use(async (req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  res.locals.cartId = req.session.cartId;
+  res.locals.user = req.user || null;
   next();
 });
 
 app.use('/', require('./routes/views.router'));
-
 app.use('/api/products', require('./routes/products.routes'));
-app.use('/api/sessions', authRoutes);
+app.use('/api/sessions', require('./routes/auth.routes'));
 app.use('/api/carts', require('./routes/carts.routes'));
 
 app.get('/', (req, res) => {
