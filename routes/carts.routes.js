@@ -6,14 +6,12 @@ const { passportCall, authorization } = require('../middlewares/auth.middleware'
 const router = Router();
 const cartManager = new CartManager();
 
-// Modificar la ruta /mycart para renderizar la vista
 router.get('/mycart',
   passport.authenticate('jwt', { session: false, failureRedirect: '/login' }),
   async (req, res) => {
     try {
       const cart = await cartManager.getCartById(req.user.cart);
       
-      // Renderizar la vista cart.handlebars con los datos necesarios
       res.render('cart', {
         cart: {
           ...cart,
@@ -61,17 +59,24 @@ router.get('/:cid', async (req, res) => {
 });
 
 
-router.post('/:cid/product/:pid', async (req, res) => {
-  const { cid, pid } = req.params;
-  try {
-    const updatedCart = await cartManager.addProductToCart(cid, pid);
-    res.json(updatedCart);
-  } catch (error) {
-    console.error('Error al agregar producto al carrito:', error);
-    res.status(400).json({ error: error.message });
-  }
-});
+router.post('/:cid/products/:pid', 
+  passport.authenticate('jwt', { session: false }),
+  authorization('user'),
+  async (req, res) => {
+    const { cid, pid } = req.params;
+    try {
+      if (req.user.cart.toString() !== cid) {
+        return res.status(403).json({ error: 'No tienes permiso para modificar este carrito' });
+      }
 
+      const updatedCart = await cartManager.addProductToCart(cid, pid);
+      res.json(updatedCart);
+    } catch (error) {
+      console.error('Error al agregar producto al carrito:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+);
 
 router.put('/:cid/products/:pid', async (req, res) => {
   const { cid, pid } = req.params;

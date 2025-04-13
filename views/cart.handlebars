@@ -35,42 +35,41 @@
 </div>
 
 <script>
-    async function removeFromCart(productId, quantity) {
-        try {
-            const response = await fetch(`/api/carts/{{cartId}}/products/${productId}?quantity=${quantity}`, {
-                method: 'DELETE',
-            });
-            const data = await response.json();
-            console.log('Producto eliminado del carrito:', data);
-            location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al eliminar el producto del carrito');
-        }
+  async function removeFromCart(productId, quantity) {
+    try {
+      const response = await fetch(`/api/carts/{{cartId}}/products/${productId}?quantity=${quantity}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      console.log('Producto eliminado del carrito:', data);
+      location.reload();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar el producto del carrito');
     }
+  }
 
-    async function purchaseCart() {
-        try {
-            // Validación adicional en frontend
-            if (!{{cart.products.length}}) {
-                throw new Error('El carrito está vacío');
-            }
+  async function purchaseCart() {
+    try {
+      if (!{{cart.products.length}}) {
+        throw new Error('El carrito está vacío');
+      }
 
-            const response = await fetch(`/api/carts/{{cart._id}}/purchase`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+      const response = await fetch(`/api/carts/{{cart._id}}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
             
-            const result = await response.json();
+      const result = await response.json();
             
-            if (result.status === 'success') {
-                alert(`Ticket de compra: ${result.ticket.code}\nTotal: $${result.ticket.amount}`);
-                window.location.href = '/products';
-            } else {
-                throw new Error(result.message);
-            }
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
+      if (result.status === 'success') {
+        alert(`Ticket de compra: ${result.ticket.code}\nTotal: $${result.ticket.amount}`);
+        window.location.href = '/products';
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
     }
+  }
 </script>

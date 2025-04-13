@@ -24,15 +24,21 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch(err => console.error('Error de conexión:', err));
 
+
 app.engine('handlebars', handlebars.engine({
-  runtimeOptions: {
-    allowProtoPropertiesByDefault: true,
-    allowProtoMethodsByDefault: true,
-  },
-  helpers: { 
-    eq: (a, b) => a === b,
-    lt: (a, b) => a < b
-  }
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true,
+      allowProtoMethodsByDefault: true,
+    },
+    helpers: { 
+      eq: (a, b) => a === b,
+      lt: (a, b) => a < b,
+      totalCart: (products) => {
+        return products.reduce((total, item) => {
+          return total + (item.product.price * item.quantity);
+        }, 0);
+      }
+    }
 }));
 
 app.set('view engine', 'handlebars');

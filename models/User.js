@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const Cart = require('./Cart');
 
 const userSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
@@ -21,11 +22,18 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) { 
   const user = this;
 
-  // Solo hashear si es nuevo o se modificó la contraseña
+  if (user.isNew && user.role === 'user' && !user.cart) { 
+    try {
+      const newCart = await Cart.create({});
+      user.cart = newCart._id;
+    } catch (err) {
+      return next(err);
+    }
+  }
+
   if (!user.isModified('password')) return next();
 
   try {
-    // Verificar si ya está hasheada
     if (!user.password.startsWith('$2b$')) {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       user.password = hashedPassword;

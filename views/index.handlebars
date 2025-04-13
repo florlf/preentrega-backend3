@@ -48,7 +48,16 @@
             <p>{{this.description}}</p>
             <p>Stock: {{this.stock}}</p>
             <img src="{{this.thumbnail}}" alt="{{this.title}}" width="200">
-            <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+            {{#if ../user}}
+                {{#if (eq ../user.role 'user')}}
+                    <button 
+                        class="add-to-cart-btn" 
+                        data-product-id="{{this._id}}"
+                    >
+                        Agregar al carrito
+                    </button>
+                {{/if}}
+            {{/if}}
         </li>
     {{else}}
         <p>No hay productos disponibles.</p>
@@ -103,19 +112,38 @@
 
     async function addToCart(productId) {
         try {
-            const response = await fetch(`/api/carts/{{cartId}}/product/${productId}`, {
-                method: 'POST',
-            });
-            const data = await response.json();
-            console.log('Producto agregado al carrito:', data);
-            alert('Producto agregado al carrito');
+            {{#if user}}
+                const cartId = '{{user.cart}}';
+                if (!cartId || cartId === 'null' || cartId === 'undefined') {
+                throw new Error('No tienes un carrito asignado');
+                }
+                const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { 
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) throw new Error(await response.text());
+                alert('✅ Producto agregado!');
+            {{else}}
+                throw new Error('🔒 Debes iniciar sesión');
+            {{/if}}
         } catch (error) {
             console.error('Error:', error);
-            alert('Error al agregar el producto al carrito');
+            alert(error.message);
+            {{#unless user}}
+                window.location.href = '/login';
+            {{/unless}}
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-    setSelectValuesFromURL();
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.dataset.productId;
+            addToCart(productId);
+        });
     });
 </script>

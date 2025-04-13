@@ -134,7 +134,6 @@ class CartManager {
       .lean();
       
 
-    // Validar carrito vacío
     if (!cart.products || cart.products.length === 0) {
       throw new Error('No hay productos en el carrito para comprar');
     }
@@ -143,7 +142,6 @@ class CartManager {
     const productsNotPurchased = [];
     let totalAmount = 0;
   
-    // Validación de stock mejorada
     for (const item of cart.products) {
       const product = await Product.findById(item.product._id);
       
@@ -168,17 +166,15 @@ class CartManager {
       }
     }
 
-    // Crear ticket con fecha formateada
     const ticket = new Ticket({
       code: `TKT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      purchase_datetime: new Date().toLocaleString('es-AR'),
+      purchase_datetime: new Date(),
       amount: totalAmount,
       purchaser: userEmail,
       products: productsToPurchase
     });
     await ticket.save();
 
-    // Actualizar carrito con productos no procesados
     await Cart.findByIdAndUpdate(
       cartId,
       { 

@@ -1,4 +1,4 @@
-# Proyecto: Sistema de Manejo de Productos y Carrito de Compras
+# Proyecto: E-commerce
 
 Este proyecto es un sistema de manejo de productos y carritos de compras desarrollado con **Node.js**, **Express**, **MongoDB** y **Mongoose**. Incluye gestión de productos y carritos, con funcionalidades avanzadas como paginación, filtrado y ordenamiento según precio ascendente o descendente. Se integró la visualización en tiempo real de los productos usando **Websockets** y **Handlebars**, además de un Register, Login y Perfil de usuario donde se les permite a los usuarios cerrar sesión.
 

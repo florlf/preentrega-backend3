@@ -15,11 +15,11 @@ const opts = {
   secretOrKey: process.env.JWT_SECRET
 };
 
-// Agregar logging para depuración
+
 passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
   try {
     console.log('JWT Payload:', jwt_payload);
-    const user = await User.findById(jwt_payload.id).populate('cart');
+    const user = await User.findById(jwt_payload.id);
     if (!user) return done(null, false);
     console.log('Usuario autenticado:', user.email);
     return done(null, user);

@@ -8,8 +8,12 @@ const productManager = new ProductManager();
 router.get('/', async (req, res) => {
   try {
     const { limit = 10, page = 1, sort, query } = req.query;
-
     const product = await productManager.getProducts({ limit, page, sort, query });
+    const user = req.user ? { 
+      ...req.user.toObject(), 
+      cart: req.user.cart._id ? req.user.cart._id.toString() : req.user.cart.toString(),
+      role: req.user.role.toString()
+    } : null;
 
     res.render('index', {
       payload: product.payload,
@@ -17,8 +21,7 @@ router.get('/', async (req, res) => {
       hasNextPage: product.hasNextPage,
       prevLink: product.prevLink,
       nextLink: product.nextLink,
-      cartId: req.session.cartId,
-      user: req.user,
+      user: user,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,6 +34,7 @@ router.get('/:pid', async (req, res) => {
   if (product) res.json(product);
   else res.status(404).json({ error: 'Producto no encontrado' });
 });
+
 
 router.post('/', 
   passportCall('jwt'), 
