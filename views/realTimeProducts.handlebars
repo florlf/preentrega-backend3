@@ -20,7 +20,22 @@
     {{#each products}}
         <li id="product-{{this._id}}">
             <strong>{{this.title}}</strong> - ${{this.price}}
+            <p>Stock actual: {{this.stock}}</p>
             <img src="{{this.thumbnail}}" alt="{{this.title}}" width="100">
+
+            {{#if (eq ../user.role 'admin')}}
+                <form class="update-stock-form" data-product-id="{{this._id}}">
+                    <input 
+                        type="number" 
+                        name="stock" 
+                        min="0" 
+                        placeholder="Nuevo stock" 
+                        required
+                    >
+                    <button type="submit">Actualizar Stock</button>
+                </form>
+            {{/if}}
+
             <button onclick="deleteProduct('{{this._id}}')">Eliminar</button>
         </li>
     {{else}}
@@ -31,17 +46,66 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
+    const isAdmin = {{#if user}}{{#eq user.role 'admin'}}true{{else}}false{{/eq}}{{else}}false{{/if}};
+
+    function setupStockForms() {
+        document.querySelectorAll('.update-stock-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const productId = form.dataset.productId;
+                const newStock = parseInt(form.stock.value);
+
+                try {
+                    const response = await fetch(`/api/products/${productId}/stock`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ stock: newStock })
+                    });
+
+                    if (response.ok) {
+                        socket.emit('updateStock', productId, newStock);
+                        form.stock.value = '';
+                    } else {
+                        const error = await response.json();
+                        alert(`Error: ${error.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al actualizar el stock');
+                }
+            });
+        });
+    }
+
+    socket.on('updateStock', (productId, newStock) => {
+        const productElement = document.getElementById(`product-${productId}`);
+        if (productElement) {
+            const stockElement = productElement.querySelector('p');
+            stockElement.textContent = `Stock actual: ${newStock}`;
+        }
+    });
 
     socket.on('updateProducts', (products) => {
         const list = document.getElementById('product-list');
         list.innerHTML = products.map(p => `
             <li id="product-${p._id}">
                 <strong>${p.title}</strong> - $${p.price}
+                <p>Stock actual: ${p.stock}</p>
                 <img src="${p.thumbnail || ''}" alt="${p.title}" width="100">
+                ${isAdmin ? `
+                    <form class="update-stock-form" data-product-id="${p._id}">
+                        <input type="number" name="stock" min="0" placeholder="Nuevo stock" required>
+                        <button type="submit">Actualizar Stock</button>
+                    </form>
+                ` : ''}
                 <button onclick="deleteProduct('${p._id}')">Eliminar</button>
             </li>
         `).join('');
+
+        setupStockForms();
     });
+
+    setupStockForms();
 
     document.getElementById('add-product-form').addEventListener('submit', async (e) => {
         e.preventDefault();

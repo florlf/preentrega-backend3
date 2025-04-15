@@ -18,10 +18,8 @@ const opts = {
 
 passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
   try {
-    console.log('JWT Payload:', jwt_payload);
     const user = await User.findById(jwt_payload.id);
     if (!user) return done(null, false);
-    console.log('Usuario autenticado:', user.email);
     return done(null, user);
   } catch (err) {
     console.error('Error en autenticación JWT:', err);

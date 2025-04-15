@@ -8,19 +8,16 @@ const pm = new ProductManager();
 const cm = new CartManager();
 
 function optionalAuth(req, res, next) {
-  console.log("Middleware ejecutándose");
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err) {
       console.error('Error en optionalAuth:', err);
     }
-    console.log('Usuario desde JWT:', user);
     req.user = user || null;
     next();
   })(req, res, next);
 }
 
 router.get('/products', optionalAuth, async (req, res) => {
-  console.log('Usuario autenticado:', req.user);
   const { limit, page, sort, query } = req.query;
   const result = await pm.getProducts({ limit, page, sort, query });
   res.render('index', { ...result, title: "Productos", user: req.user || null });
@@ -41,14 +38,13 @@ router.get('/realtimeproducts',
   passport.authenticate('jwt', { session: false }), 
   async (req, res) => {
     try {
-      // Verificar si es admin
       if (req.user.role !== 'admin') {
         return res.redirect('/products');
       }
 
       const products = await pm.getProducts({});
-      res.render('realTimeProducts', { 
-        products: products.payload,
+      res.render('realTimeProducts', { // 👈 Nombre correcto de la vista
+        products: products.payload || [],
         title: "Productos en Tiempo Real",
         user: req.user
       });

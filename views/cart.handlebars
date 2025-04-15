@@ -6,6 +6,7 @@
             <strong>{{this.product.title}}</strong> 
             <p>${{this.product.price}}</p>
             <p>Cantidad: {{this.quantity}}</p>
+            <button onclick="addOneToCart('{{this.product._id}}')">Agregar 1</button>
             <button onclick="removeFromCart('{{this.product._id}}', 1)">Eliminar 1</button>
             <button onclick="removeFromCart('{{this.product._id}}', {{this.quantity}})">Eliminar todo</button>
         </li>
@@ -35,6 +36,29 @@
 </div>
 
 <script>
+  async function addOneToCart(productId) {
+    try {
+        const response = await fetch(`/api/carts/{{cart._id}}/products/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            document.getElementById(`stock-error-${productId}`).style.display = 'block';
+            document.getElementById(`stock-error-${productId}`).textContent = data.error;
+            return;
+        }
+        
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al agregar el producto');
+    }
+  }
+
   async function removeFromCart(productId, quantity) {
     try {
       const response = await fetch(`/api/carts/{{cartId}}/products/${productId}?quantity=${quantity}`, {

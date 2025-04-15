@@ -12,9 +12,11 @@
 </div>
 
 {{#if user}}
-  <a href="/api/carts/mycart">
-    <button>Mi Carrito</button>
-  </a>
+  {{#unless (eq user.role 'admin')}}
+    <a href="/api/carts/mycart">
+      <button>Mi Carrito</button>
+    </a>
+  {{/unless}}
 {{/if}}
 
 <div>

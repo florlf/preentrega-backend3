@@ -91,14 +91,11 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('Un cliente se ha conectado');
-
   Product.find().lean()
     .then(products => socket.emit('updateProducts', products))
     .catch(error => console.error('Error al obtener productos:', error));
 
   socket.on('disconnect', () => {
-    console.log('Un cliente se ha desconectado');
   });
 });
 

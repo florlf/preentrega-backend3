@@ -54,6 +54,24 @@ router.post('/',
   }
 });
 
+router.put('/:pid/stock', 
+  passportCall('jwt'), 
+  authorization(['admin']),
+  async (req, res) => {
+    const { pid } = req.params;
+    const { stock } = req.body;
+
+    try {
+      const product = await productManager.updateProductStock(pid, stock);
+      const io = req.app.get('io');
+      io.emit('updateStock', pid, stock);
+      res.json(product);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+);
+
 router.put('/:pid', 
   passportCall('jwt'), 
   authorization(['admin']),

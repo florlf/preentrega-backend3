@@ -52,28 +52,38 @@ class CartManager {
 
   async addProductToCart(cartId, productId) {
     if (!Types.ObjectId.isValid(cartId) || !Types.ObjectId.isValid(productId)) {
-      throw new Error('ID de carrito o producto no válido');
+        throw new Error('ID de carrito o producto no válido');
     }
 
+    const product = await Product.findById(productId);
+    if (!product) throw new Error('Producto no encontrado');
+    
     let cart = await Cart.findById(cartId);
     if (!cart) {
-      cart = new Cart({ _id: cartId, products: [] });
-      await cart.save();
+        cart = new Cart({ _id: cartId, products: [] });
+        await cart.save();
     }
 
-    const productIndex = cart.products.findIndex(
-      (p) => p.product.toString() === productId
+    const cartProduct = cart.products.find(p => 
+        p.product.toString() === productId
     );
 
-    if (productIndex === -1) {
-      cart.products.push({ product: productId, quantity: 1 });
+    if (cartProduct) {
+        if (cartProduct.quantity + 1 > product.stock) {
+            throw new Error(`No hay suficiente stock. Disponible: ${product.stock}`);
+        }
+        cartProduct.quantity += 1;
     } else {
-      cart.products[productIndex].quantity += 1;
+        if (product.stock < 1) {
+            throw new Error('Producto sin stock disponible');
+        }
+        cart.products.push({ product: productId, quantity: 1 });
     }
 
     await cart.save();
     return cart;
   }
+
 
   async updateCart(cartId, products) {
     if (!Types.ObjectId.isValid(cartId)) {

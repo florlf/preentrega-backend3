@@ -56,6 +56,19 @@ class ProductManager {
   async deleteProduct(id) {
     return await Product.findByIdAndDelete(id);
   }
+
+  async updateProductStock(productId, newStock) {
+    if (newStock < 0) throw new Error("El stock no puede ser negativo");
+    
+    const product = await Product.findByIdAndUpdate(
+        productId,
+        { stock: newStock },
+        { new: true }
+    ).lean();
+
+    if (!product) throw new Error("Producto no encontrado");
+    return product;
+  }
 }
 
 module.exports = ProductManager;
