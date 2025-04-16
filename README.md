@@ -50,7 +50,7 @@ Sistema de e-commerce con arquitectura en capas, gestión de productos, carritos
 ### Requisitos Previos
 - Node.js
 - MongoDB Atlas (o local)
-- Postman/Insomnia para testing
+- Postman para testing
 
 ### Instalación
 
