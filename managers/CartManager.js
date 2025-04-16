@@ -2,8 +2,13 @@ const Cart = require('../models/Cart');
 const { Types } = require('mongoose');
 const Ticket = require('../models/Ticket');
 const Product = require('../models/Product');
+const MailingService = require('../services/mailing.service');
 
 class CartManager {
+  constructor() {
+    this.mailingService = new MailingService();
+  }
+
   async createCart() {
     const newCart = new Cart({ products: [] });
     return await newCart.save();
@@ -184,6 +189,8 @@ class CartManager {
       products: productsToPurchase
     });
     await ticket.save();
+
+    await this.mailingService.sendPurchaseEmail(userEmail, ticket);
 
     await Cart.findByIdAndUpdate(
       cartId,
