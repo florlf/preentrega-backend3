@@ -36,7 +36,7 @@
                 </form>
             {{/if}}
 
-            <button onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+            <button onclick="deleteProduct('{{this._id}}')">Eliminar producto</button>
         </li>
     {{else}}
         <p>No hay productos disponibles.</p>
@@ -98,7 +98,7 @@
                         <button type="submit">Actualizar Stock</button>
                     </form>
                 ` : ''}
-                <button onclick="deleteProduct('${p._id}')">Eliminar</button>
+                <button onclick="deleteProduct('${p._id}')">Eliminar producto</button>
             </li>
         `).join('');
 

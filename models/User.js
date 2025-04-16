@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const Cart = require('./Cart');
 
 const userSchema = new mongoose.Schema({
@@ -19,29 +18,16 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save', async function(next) { 
-  const user = this;
-
-  if (user.isNew && user.role === 'user' && !user.cart) { 
+userSchema.pre('save', async function(next) {
+  if (this.isNew && this.role === 'user' && !this.cart) { 
     try {
       const newCart = await Cart.create({});
-      user.cart = newCart._id;
+      this.cart = newCart._id;
     } catch (err) {
       return next(err);
     }
   }
-
-  if (!user.isModified('password')) return next();
-
-  try {
-    if (!user.password.startsWith('$2b$')) {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      user.password = hashedPassword;
-    }
-    next();
-  } catch (err) {
-    next(err);
-  }
+  next();
 });
 
 module.exports = mongoose.model('User', userSchema);

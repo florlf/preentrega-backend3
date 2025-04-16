@@ -43,7 +43,7 @@ router.get('/realtimeproducts',
       }
 
       const products = await pm.getProducts({});
-      res.render('realTimeProducts', { // 👈 Nombre correcto de la vista
+      res.render('realTimeProducts', {
         products: products.payload || [],
         title: "Productos en Tiempo Real",
         user: req.user
