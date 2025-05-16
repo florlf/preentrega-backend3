@@ -1,0 +1,61 @@
+{
+	"info": {
+		"_postman_id": "2916b91d-2eb7-48d5-9ee3-cc5b5a40eab4",
+		"name": "E-commerce Mocks",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41346229"
+	},
+	"item": [
+		{
+			"name": "GET Mock Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/mocks/mockingusers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"mocks",
+						"mockingusers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Generate Data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"users\": 2,\r\n  \"pets\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/mocks/generateData",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"mocks",
+						"generateData"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

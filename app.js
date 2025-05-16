@@ -18,6 +18,7 @@ const Product = require('./models/Product');
 const productRoutes = require('./routes/products.routes');
 const authRoutes = require('./routes/auth.routes');
 const cors = require('cors');
+const mocksRouter = require ('./routes/mocks.router.js');
 
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -57,6 +58,7 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use('/api/mocks', mocksRouter);
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -32,19 +32,6 @@ Sistema de e-commerce con arquitectura en capas, gestión de productos, carritos
 - Envío automático de tickets al finalizar compra al e-mail del comprador.
 - Plantillas profesionales con detalles de compra.
 
-## 🛠 Tecnologías Utilizadas
-
-**Node.js** (https://nodejs.org/en/docs/) 
-**Express** (https://expressjs.com/)
-**MongoDB** (https://www.mongodb.com/docs/)
-**Mongoose** (https://mongoosejs.com/)
-**Socket.io** (https://socket.io/docs/v4/)
-**Handlebars** (https://handlebarsjs.com/)
-**JWT** (https://auth0.com/docs/secure/tokens/json-web-tokens)
-**Passport.js** (https://www.passportjs.org/docs/)
-**bcrypt** (https://www.npmjs.com/package/bcrypt)
-**Nodemailer** (https://www.nodemailer.com/)
-
 ## 🔧 Configuración del Proyecto
 
 ### Requisitos Previos
@@ -66,3 +53,52 @@ Además, se otorga *acceso por privado* al usuario *ADMIN* para testear el *CRUD
 Además, la base de datos está configurada para permitir el acceso desde cualquier IP (0.0.0.0/0), por lo que *no es necesario configurar IPs específicas*.
 
 **4. Iniciar el servidor**
+
+## API Endpoints  
+
+### Postman: Cómo probar los endpoints
+Descargar la colección desde *[postman/collections/E-commerce Mocks.postman_collection.json]* e importarla en Postman.
+
+#### GET Mock Users
+GET http://localhost:8080/api/mocks/mockingusers
+
+**¿Qué hace?:**
+Genera 50 usuarios mock en memoria.
+Cada usuario tiene el mismo formato que un documento de MongoDB:
+{
+  "_id": "65a1b2c3d4e5f6g7h8i9j0",  // ID ficticio
+  "password": "$2b$10$...",         // "coder123" encriptado
+  "role": "user",                   // "user" o "admin" aleatorio
+  "pets": []                        // Array vacío
+}
+
+#### POST Generate Data
+POST http://localhost:8080/api/mocks/generateData
+Body - raw (JSON):  
+{  
+  "users": 2,  
+  "pets": 1  
+}
+
+**¿Qué hace?:**
+Inserta en la base de datos usuarios y mascotas mock según las cantidades especificadas.
+Los usuarios generados tienen:
+-Contraseña encriptada (coder123).
+-Rol aleatorio (user o admin).
+-Array de mascotas vacío (pets: []).
+-Las mascotas generadas tienen datos aleatorios (nombre, tipo, etc.).
+
+
+## 🛠 Tecnologías Utilizadas
+
+**Node.js** (https://nodejs.org/en/docs/) 
+**Express** (https://expressjs.com/)
+**MongoDB** (https://www.mongodb.com/docs/)
+**Mongoose** (https://mongoosejs.com/)
+**Socket.io** (https://socket.io/docs/v4/)
+**Handlebars** (https://handlebarsjs.com/)
+**JWT** (https://auth0.com/docs/secure/tokens/json-web-tokens)
+**Passport.js** (https://www.passportjs.org/docs/)
+**bcrypt** (https://www.npmjs.com/package/bcrypt)
+**Nodemailer** (https://www.nodemailer.com/)
+**@faker-js/faker** (https://fakerjs.dev/)
