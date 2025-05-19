@@ -1,6 +1,13 @@
 const ProductDAO = require('../dao/ProductDAO');
 
 class ProductRepository {
+  async bulkCreate(products) {
+    try {
+      return await Product.insertMany(products);
+    } catch (error) {
+      throw error;
+    }
+  }
   constructor() {
     this.dao = new ProductDAO();
   }

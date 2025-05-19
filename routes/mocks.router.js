@@ -1,54 +1,37 @@
-const { Router } = require('express');
-const { generateMockUsers, generateMockPets } = require('../utils/mockingModule');
-const UserService = require('../services/users.service');
-const PetService = require('../services/pets.service');
+const express = require('express');
+const router = express.Router();
+const { generateMockUsers } = require('../mocking/users.mock');
+const { generateMockProducts } = require('../mocking/products.mock');
+const User = require('../models/User');
+const Product = require('../models/Product');
 
-const router = Router();
-
-router.get('/mockingpets', (req, res) => {
+router.post('/:users/:products', async (req, res) => {
   try {
-    const mockPets = generateMockPets(50);
-    res.json({ status: 'success', payload: mockPets });
-  } catch (error) {
-    res.status(500).json({ status: 'error', error: error.message });
-  }
-});
+    const users = parseInt(req.params.users);
+    const products = parseInt(req.params.products);
 
-router.get('/mockingusers', (req, res) => {
-  try {
-    const mockUsers = generateMockUsers(50);
-    res.json({ status: 'success', payload: mockUsers });
-  } catch (error) {
-    res.status(500).json({ status: 'error', error: error.message });
-  }
-});
-
-router.post('/generateData', async (req, res) => {
-  try {
-    const { users = 0, pets = 0 } = req.body;
-    
-    if (isNaN(users)) throw new Error('users debe ser un número');
-    if (isNaN(pets)) throw new Error('pets debe ser un número');
-
-    let createdUsers = [];
-    if (users > 0) {
-      const mockUsers = generateMockUsers(users);
-      createdUsers = await UserService.bulkCreate(mockUsers);
+    if (isNaN(users) || isNaN(products)) {
+      return res.status(400).json({ error: 'Los parámetros deben ser números' });
     }
 
-    let createdPets = [];
-    if (pets > 0) {
-      const mockPets = generateMockPets(pets);
-      createdPets = await PetService.bulkCreate(mockPets);
-    }
+    const mockUsers = generateMockUsers(users);
+    await User.insertMany(mockUsers);
+
+    const mockProducts = generateMockProducts(products);
+    await Product.insertMany(mockProducts);
 
     res.json({
       status: 'success',
-      users_created: createdUsers.length,
-      pets_created: createdPets.length
+      users: users,
+      products: products
     });
+
   } catch (error) {
-    res.status(500).json({ status: 'error', error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ 
+      status: 'error',
+      error: error.message
+    });
   }
 });
 

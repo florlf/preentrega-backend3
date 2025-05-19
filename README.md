@@ -59,35 +59,19 @@ Además, la base de datos está configurada para permitir el acceso desde cualqu
 ### Postman: Cómo probar los endpoints
 Descargar la colección desde *[postman/collections/E-commerce Mocks.postman_collection.json]* e importarla en Postman.
 
-#### GET Mock Users
-GET http://localhost:8080/api/mocks/mockingusers
-
-**¿Qué hace?:**
-Genera 50 usuarios mock en memoria.
-Cada usuario tiene el mismo formato que un documento de MongoDB:
-{
-  "_id": "65a1b2c3d4e5f6g7h8i9j0",  // ID ficticio
-  "password": "$2b$10$...",         // "coder123" encriptado
-  "role": "user",                   // "user" o "admin" aleatorio
-  "pets": []                        // Array vacío
-}
-
 #### POST Generate Data
-POST http://localhost:8080/api/mocks/generateData
-Body - raw (JSON):  
-{  
-  "users": 2,  
-  "pets": 1  
+POST http://localhost:8080/api/mocks/:users/:products
+Ejemplo: http://localhost:8080/api/mocks/2/1
+
+Respuesta:
+{
+  "status": "success",
+  "users": 2,
+  "products": 1
 }
 
 **¿Qué hace?:**
-Inserta en la base de datos usuarios y mascotas mock según las cantidades especificadas.
-Los usuarios generados tienen:
--Contraseña encriptada (coder123).
--Rol aleatorio (user o admin).
--Array de mascotas vacío (pets: []).
--Las mascotas generadas tienen datos aleatorios (nombre, tipo, etc.).
-
+Inserta en la base de datos usuarios y productos mock según las cantidades especificadas.
 
 ## 🛠 Tecnologías Utilizadas
 

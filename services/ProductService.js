@@ -46,6 +46,16 @@ class ProductService {
   async updateProductStock(productId, newStock) {
     return this.productRepository.updateProductStock(productId, newStock);
   }
+
+  async bulkCreate(quantity) {
+    try {
+      const mockProducts = generateMockProducts(quantity);
+      const createdProducts = await this.productRepository.bulkCreate(mockProducts);
+      return createdProducts;
+    } catch (error) {
+      throw new Error(`Error creating mock products: ${error.message}`);
+    }
+  }
 }
 
 module.exports = ProductService;

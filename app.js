@@ -19,6 +19,8 @@ const productRoutes = require('./routes/products.routes');
 const authRoutes = require('./routes/auth.routes');
 const cors = require('cors');
 const mocksRouter = require ('./routes/mocks.router.js');
+const logger = require('./utils/logger');
+const loggerMiddleware = require('./middlewares/loggerMiddleware');
 
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -58,7 +60,7 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use('/api/mocks', mocksRouter);
+app.use(loggerMiddleware);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -67,6 +69,7 @@ app.use(cors({
   origin: 'http://localhost:8080',
   credentials: true,
 }));
+
 
 
 app.use(async (req, res, next) => {
@@ -83,13 +86,29 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', require('./routes/views.router'));
+app.use('/api/mocks', mocksRouter);
 app.use('/api/products', require('./routes/products.routes'));
 app.use('/api/sessions', require('./routes/auth.routes'));
 app.use('/api/carts', require('./routes/carts.routes'));
 
+app.use('/', require('./routes/views.router'));
+
 app.get('/', (req, res) => {
   res.redirect('/products');
+});
+
+app.use((err, req, res, next) => {
+  logger.error('Error no manejado:', {
+    error: err.message,
+    stack: err.stack,
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      body: req.body
+    }
+  });
+  
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
 io.on('connection', (socket) => {
