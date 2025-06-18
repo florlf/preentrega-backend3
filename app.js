@@ -21,6 +21,7 @@ const cors = require('cors');
 const mocksRouter = require ('./routes/mocks.router.js');
 const logger = require('./utils/logger');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
+const swaggerSetup = require('./config/swagger');
 
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -70,7 +71,7 @@ app.use(cors({
   credentials: true,
 }));
 
-
+swaggerSetup(app);
 
 app.use(async (req, res, next) => {
   if (!req.session.cartId) {

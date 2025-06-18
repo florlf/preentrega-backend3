@@ -73,7 +73,37 @@ Respuesta:
 **¿Qué hace?:**
 Inserta en la base de datos usuarios y productos mock según las cantidades especificadas.
 
-## 🛠 Tecnologías Utilizadas
+
+## Imagen Docker
+
+La imagen Docker del proyecto está publicada en Docker Hub:
+
+[florrlf/miapp-ecommerce](https://hub.docker.com/repository/docker/florrlf/miapp-ecommerce)
+
+Para descargarla y usarla, ejecuta:
+
+*docker pull florrlf/miapp-ecommerce:latest*
+*docker run -p 8080:8080 florrlf/miapp-ecommerce:latest*
+
+
+## Documentación y Testeo con Swagger
+
+La API incluye documentación interactiva generada con Swagger, donde podés consultar y probar los endpoints del módulo **Users**.
+
+### Cómo acceder a la documentación
+
+1. Ejecutá el servidor (local o en contenedor Docker):
+
+Ej.: *node app.js*
+
+2. Abrí en tu navegador la siguiente URL:
+
+http://localhost:8080/api-docs
+
+3. En la interfaz web que se abre, vas a ver todos los endpoints documentados.
+
+
+## Tecnologías Utilizadas
 
 **Node.js** (https://nodejs.org/en/docs/) 
 **Express** (https://expressjs.com/)
@@ -86,3 +116,5 @@ Inserta en la base de datos usuarios y productos mock según las cantidades espe
 **bcrypt** (https://www.npmjs.com/package/bcrypt)
 **Nodemailer** (https://www.nodemailer.com/)
 **@faker-js/faker** (https://fakerjs.dev/)
+**Docker** (https://docs.docker.com/)
+**Swagger** (https://swagger.io/docs/)
