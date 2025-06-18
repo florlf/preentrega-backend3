@@ -82,7 +82,8 @@ La imagen Docker del proyecto está publicada en Docker Hub:
 
 Para descargarla y usarla, ejecuta:
 
-*docker pull florrlf/miapp-ecommerce:latest*
+*docker pull florrlf/miapp-ecommerce:latest*  
+
 *docker run -p 8080:8080 florrlf/miapp-ecommerce:latest*
 
 
